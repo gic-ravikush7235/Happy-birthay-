@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, type CSSProperties, type TouchEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -28,12 +28,12 @@ You deserve all the happiness in this world. Always keep smiling, always keep sh
 And remember... you mean a lot to me. Hamesha. ❤️`
 
 const galleryPhotos = [
-  { id: 1, caption: 'My favorite person 💕', placeholder: 'Photo 1' },
-  { id: 2, caption: 'That beautiful smile ✨', placeholder: 'Photo 2' },
-  { id: 3, caption: 'Unforgettable moments 🌸', placeholder: 'Photo 3' },
-  { id: 4, caption: 'You light up everything 🌟', placeholder: 'Photo 4' },
-  { id: 5, caption: 'Always in my heart ❤️', placeholder: 'Photo 5' },
-  { id: 6, caption: 'My sunshine ☀️', placeholder: 'Photo 6' },
+  { id: 1, caption: 'My favorite person 💕', placeholder: 'Photo 1', src: '/R1.png' },
+  { id: 2, caption: 'That beautiful smile ✨', placeholder: 'Photo 2', src: '/R2.png' },
+  { id: 3, caption: 'Unforgettable moments 🌸', placeholder: 'Photo 3', src: '/R3.png' },
+  { id: 4, caption: 'You light up everything 🌟', placeholder: 'Photo 4', src: '/R4.png' },
+  { id: 5, caption: 'Always in my heart ❤️', placeholder: 'Photo 5', src: '/R5.png' },
+  { id: 6, caption: 'All our sweetest memories 💖', placeholder: 'Photo 6', src: '/R6.png' },
 ]
 
 const memoryPages = [
@@ -73,7 +73,7 @@ function FloatingHearts({ count = 15 }: { count?: number }) {
             '--duration': `${5 + Math.random() * 6}s`,
             '--delay': `${Math.random() * 8}s`,
             fontSize: `${14 + Math.random() * 20}px`,
-          } as React.CSSProperties}
+          } as CSSProperties}
         >
           {hearts[i % hearts.length]}
         </div>
@@ -96,7 +96,7 @@ function Sparkles({ count = 20 }: { count?: number }) {
             '--duration': `${2 + Math.random() * 3}s`,
             '--delay': `${Math.random() * 4}s`,
             fontSize: `${8 + Math.random() * 14}px`,
-          } as React.CSSProperties}
+          } as CSSProperties}
         >
           ✦
         </div>
@@ -122,7 +122,7 @@ function Confetti({ count = 30 }: { count?: number }) {
             height: `${6 + Math.random() * 8}px`,
             backgroundColor: colors[i % colors.length],
             borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-          } as React.CSSProperties}
+          } as CSSProperties}
         />
       ))}
     </div>
@@ -145,7 +145,7 @@ function MusicToggle({ isMuted, onToggle }: { isMuted: boolean; onToggle: () => 
 }
 
 // ─── Opening Screen ──────────────────────────────────────────────────────────
-function OpeningScreen({ onStart }: { onStart: () => void }) {
+function OpeningScreen({ onStart }: { onStart: () => void; key?: string }) {
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
@@ -231,7 +231,7 @@ function OpeningScreen({ onStart }: { onStart: () => void }) {
 }
 
 // ─── Message Screen ──────────────────────────────────────────────────────────
-function MessageScreen({ onContinue }: { onContinue: () => void }) {
+function MessageScreen({ onContinue }: { onContinue: () => void; key?: string }) {
   const [displayedText, setDisplayedText] = useState('')
   const [isTypingDone, setIsTypingDone] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -335,19 +335,19 @@ function MessageScreen({ onContinue }: { onContinue: () => void }) {
 }
 
 // ─── Gallery Screen ──────────────────────────────────────────────────────────
-function GalleryScreen({ onContinue }: { onContinue: () => void }) {
+function GalleryScreen({ onContinue }: { onContinue: () => void; key?: string }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   const minSwipeDistance = 50
 
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onTouchStart = (e: TouchEvent) => {
     setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
   }
 
-  const onTouchMove = (e: React.TouchEvent) => {
+  const onTouchMove = (e: TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
@@ -422,18 +422,27 @@ function GalleryScreen({ onContinue }: { onContinue: () => void }) {
                 }}
               >
                 {/* Placeholder for real photo - user can replace */}
-                <div className="text-center">
-                  <div className="text-6xl mb-3">📷</div>
-                  <p className="text-sm font-medium px-4" style={{ color: '#ad1457' }}>
-                    {currentPhoto.placeholder}
-                  </p>
-                  <p className="text-xs mt-1 opacity-50 px-4" style={{ color: '#c2185b' }}>
-                    Replace with Rani&apos;s photo
-                  </p>
-                </div>
+                {currentPhoto.src ? (
+                  <img
+                    src={currentPhoto.src}
+                    alt={currentPhoto.caption}
+                    className="w-full h-full object-cover"
+                    style={{ minHeight: '280px' }}
+                  />
+                ) : (
+                  <div className="text-center">
+                    <div className="text-6xl mb-3">📷</div>
+                    <p className="text-sm font-medium px-4" style={{ color: '#ad1457' }}>
+                      {currentPhoto.placeholder}
+                    </p>
+                    <p className="text-xs mt-1 opacity-50 px-4" style={{ color: '#c2185b' }}>
+                      Replace with Rani&apos;s photo
+                    </p>
+                  </div>
+                )}
                 {/* Decorative elements */}
-                <div className="absolute top-3 right-3 text-2xl twinkle" style={{ '--duration': '2s', '--delay': '0s' } as React.CSSProperties}>✦</div>
-                <div className="absolute bottom-3 left-3 text-2xl twinkle" style={{ '--duration': '3s', '--delay': '1s' } as React.CSSProperties}>✦</div>
+                <div className="absolute top-3 right-3 text-2xl twinkle" style={{ '--duration': '2s', '--delay': '0s' } as CSSProperties}>✦</div>
+                <div className="absolute bottom-3 left-3 text-2xl twinkle" style={{ '--duration': '3s', '--delay': '1s' } as CSSProperties}>✦</div>
               </div>
 
               {/* Caption */}
@@ -496,7 +505,7 @@ function GalleryScreen({ onContinue }: { onContinue: () => void }) {
 }
 
 // ─── Memory Book Screen ──────────────────────────────────────────────────────
-function MemoryBookScreen({ onContinue }: { onContinue: () => void }) {
+function MemoryBookScreen({ onContinue }: { onContinue: () => void; key?: string }) {
   const [currentPage, setCurrentPage] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
@@ -511,12 +520,12 @@ function MemoryBookScreen({ onContinue }: { onContinue: () => void }) {
     setTimeout(() => setIsFlipping(false), 800)
   }
 
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onTouchStart = (e: TouchEvent) => {
     setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
   }
 
-  const onTouchMove = (e: React.TouchEvent) => {
+  const onTouchMove = (e: TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
@@ -615,8 +624,8 @@ function MemoryBookScreen({ onContinue }: { onContinue: () => void }) {
               <div className="text-center mt-4 text-2xl">🌸</div>
 
               {/* Corner decorations */}
-              <div className="absolute top-3 right-3 text-xs twinkle" style={{ '--duration': '2s' } as React.CSSProperties}>✦</div>
-              <div className="absolute bottom-3 left-5 text-xs twinkle" style={{ '--duration': '3s', '--delay': '1s' } as React.CSSProperties}>✦</div>
+              <div className="absolute top-3 right-3 text-xs twinkle" style={{ '--duration': '2s' } as CSSProperties}>✦</div>
+              <div className="absolute bottom-3 left-5 text-xs twinkle" style={{ '--duration': '3s', '--delay': '1s' } as CSSProperties}>✦</div>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -795,8 +804,8 @@ export default function Home() {
 
   useEffect(() => {
     // Create audio element (soft background music)
-    // Using a royalty-free romantic instrumental
-    audioRef.current = new Audio('https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3')
+    // Using a royalty-free happy birthday instrumental
+    audioRef.current = new Audio('DHUN.mp3')
     audioRef.current.loop = true
     audioRef.current.volume = 0.3
     audioRef.current.preload = 'auto'
